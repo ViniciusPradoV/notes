@@ -27,6 +27,7 @@ class NavigationActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        replaceFragment(TasksListFragment.newInstance())
         setContentView(R.layout.activity_navigation)
 
 
