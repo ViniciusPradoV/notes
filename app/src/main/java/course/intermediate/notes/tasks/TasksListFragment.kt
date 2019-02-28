@@ -35,9 +35,9 @@ class TasksListFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(context)
         val adapter = TaskAdapter(
             mutableListOf<Task>(
-                Task(" Testing One", mutableListOf(
-                        Todo("Test one!"),
-                        Todo("Test two!")
+                Task(
+                    " Testing One", mutableListOf(
+                        Todo("Test one!", true), Todo("Test Two")
                     )
                 ),
                 Task(" Testing Two")

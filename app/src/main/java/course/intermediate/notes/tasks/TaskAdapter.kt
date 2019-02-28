@@ -1,5 +1,6 @@
 package course.intermediate.notes.tasks
 
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import course.intermediate.notes.R
 import course.intermediate.notes.foundations.BaseReclyclerAdapter
 import course.intermediate.notes.models.Task
+import course.intermediate.notes.views.TodoView
 import kotlinx.android.synthetic.main.item_task.view.*
 import kotlinx.android.synthetic.main.view_todo.view.*
 
@@ -19,8 +21,9 @@ class TaskAdapter(taskList: MutableList<Task> = mutableListOf()
             view.titleView.text = data.title
             data.todos.forEach {todo ->
 
-                val todoView = LayoutInflater.from(view.context).inflate(R.layout.view_todo, view.todoContainer, false)
-                todoView.descriptionView.text = todo.description
+                val todoView = (LayoutInflater.from(view.context).inflate(R.layout.view_todo, view.todoContainer, false) as TodoView).apply{
+                    initView(todo)
+                }
                 view.todoContainer.addView(todoView)
 
             }

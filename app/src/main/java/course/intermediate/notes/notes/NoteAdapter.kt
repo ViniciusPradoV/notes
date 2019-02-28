@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import course.intermediate.notes.R
 import course.intermediate.notes.foundations.BaseReclyclerAdapter
 import course.intermediate.notes.models.Note
+import course.intermediate.notes.views.NoteView
 import kotlinx.android.synthetic.main.item_note.view.*
 
 class NoteAdapter(
@@ -16,7 +17,7 @@ class NoteAdapter(
     class ViewHolder(view: View) : BaseReclyclerAdapter.BaseViewHolder<Note>(view) {
 
         override fun onBind(data: Note) {
-            view.titleView.text = data.description
+            (view as NoteView).initView(data)
         }
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false))
