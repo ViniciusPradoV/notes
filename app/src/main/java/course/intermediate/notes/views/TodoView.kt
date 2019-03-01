@@ -7,28 +7,31 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import course.intermediate.notes.models.Todo
 import kotlinx.android.synthetic.main.view_todo.view.*
 
-class TodoView @JvmOverloads constructor (context: Context,
-               attrs: AttributeSet? = null,
-               defStyleAttr: Int = 1
+class TodoView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 1
 
 
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
 
-    fun initView(todo: Todo) {
+    fun initView(todo: Todo, callback: (() -> Unit)? = null) {
 
         descriptionView.text = todo.description
-        completeCheckBox.isChecked = todo.isComplete
+        completeCheckBox!!.isChecked = todo.isComplete
         if (todo.isComplete) {
-            descriptionView.paintFlags = descriptionView!!.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+            descriptionView.apply { paintFlags or Paint.STRIKE_THRU_TEXT_FLAG }
         }
 
-        setUpCheckStateListener()
+        setUpCheckStateListener(todo, callback)
 
     }
 
-    fun setUpCheckStateListener() {
+    fun setUpCheckStateListener(todo: Todo, callback: (() -> Unit)? = null) {
         completeCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            todo.isComplete = isChecked
+            callback?.invoke()
             if (isChecked) {
 
                 createStrikeThrough()
@@ -40,18 +43,14 @@ class TodoView @JvmOverloads constructor (context: Context,
         }
     }
 
-    fun createStrikeThrough() {
+    private fun createStrikeThrough() {
 
-        descriptionView.apply {
-            paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        }
+        descriptionView.apply { paintFlags = descriptionView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG }
     }
 
-    fun removeStrikeThrough() {
+    private fun removeStrikeThrough() {
 
-        descriptionView.apply {
-            paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-        }
+        descriptionView.apply { paintFlags = descriptionView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv() }
     }
 
 }
