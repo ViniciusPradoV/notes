@@ -9,16 +9,33 @@ import course.intermediate.notes.foundations.BaseReclyclerAdapter
 import course.intermediate.notes.models.Note
 import course.intermediate.notes.views.NoteView
 import kotlinx.android.synthetic.main.item_note.view.*
+import kotlinx.android.synthetic.main.view_add_button.view.*
 
 class NoteAdapter(
     noteList: MutableList<Note> = mutableListOf()
 ) : BaseReclyclerAdapter<Note>(noteList) {
 
-    class ViewHolder(view: View) : BaseReclyclerAdapter.BaseViewHolder<Note>(view) {
+    class NoteViewHolder(view: View) : BaseReclyclerAdapter.BaseViewHolder<Note>(view) {
 
         override fun onBind(data: Note) {
             (view as NoteView).initView(data)
         }
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false))
+
+    class AddButtonViewHolder(view: View): BaseReclyclerAdapter.BaseViewHolder<Unit>(view){
+
+        override fun onBind(data: Unit) {
+            view.buttonText.text = view.context.getString(R.string.add_button_note)
+        }
+    }
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =  if(viewType == TYPE_INFO){
+        NoteViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false))
+    }else{
+
+        AddButtonViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_add_button, parent, false))
+    }
+
 }
+
