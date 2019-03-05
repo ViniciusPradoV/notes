@@ -7,11 +7,15 @@ import androidx.recyclerview.widget.RecyclerView
 import course.intermediate.notes.R
 import course.intermediate.notes.foundations.BaseReclyclerAdapter
 import course.intermediate.notes.models.Task
+import course.intermediate.notes.navigation.NavigationActivity
 import course.intermediate.notes.views.TaskView
 import kotlinx.android.synthetic.main.view_add_button.view.*
 
-class TaskAdapter(taskList: MutableList<Task> = mutableListOf()
+class TaskAdapter(
+    taskList: MutableList<Task> = mutableListOf(),
+    val touchActionDelegate: TasksListFragment.TouchActionDelegate
 ): BaseReclyclerAdapter<Task>(taskList) {
+
 
     class TaskViewHolder(view: View):BaseViewHolder<Task>(view){
 
@@ -21,9 +25,13 @@ class TaskAdapter(taskList: MutableList<Task> = mutableListOf()
         }
     }
 
-    class AddButtonViewHolder(view: View): BaseViewHolder<Unit>(view) {
+    inner class AddButtonViewHolder(view: View): BaseViewHolder<Unit>(view) {
         override fun onBind(data: Unit) {
             view.buttonText.text = view.context.getString(R.string.add_button_task)
+
+            view.setOnClickListener{
+                touchActionDelegate.onAddButtonClicked(NavigationActivity.FRAGMENT_VALUE_TASK)
+            }
         }
     }
 

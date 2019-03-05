@@ -1,6 +1,7 @@
 package course.intermediate.notes.notes
 
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -14,6 +15,18 @@ import kotlinx.android.synthetic.main.fragment_tasks_list.*
 
 
 class NotesListFragment : Fragment() {
+
+    lateinit var touchActionDelegate: TouchActionDelegate
+
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+
+        context?.let{
+            if (it is TouchActionDelegate){
+                touchActionDelegate = it
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +48,8 @@ class NotesListFragment : Fragment() {
             mutableListOf<Note>(
                 Note("I'm test note 1"),
                 Note("I'm test note 2")
-            )
+            ),
+            touchActionDelegate
         )
         recyclerView.adapter = adapter
     }
@@ -45,6 +59,10 @@ class NotesListFragment : Fragment() {
         fun newInstance(): NotesListFragment {
             return NotesListFragment()
         }
+    }
+
+    interface TouchActionDelegate {
+        fun onAddButtonClicked(value: String)
     }
 
 }
