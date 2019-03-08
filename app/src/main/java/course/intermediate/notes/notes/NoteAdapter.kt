@@ -13,33 +13,33 @@ import kotlinx.android.synthetic.main.view_add_button.view.*
 
 class NoteAdapter(
     noteList: MutableList<Note> = mutableListOf(),
-    val touchActionDelegate: NotesListFragment.TouchActionDelegate
+    val touchActionDelegate: NotesListFragment.TouchActionDelegate,
+    val dataActionDelegate: NoteListViewContract
 ) : BaseReclyclerAdapter<Note>(noteList) {
-
-    class NoteViewHolder(view: View) : BaseReclyclerAdapter.BaseViewHolder<Note>(view) {
-
-        override fun onBind(data: Note) {
-            (view as NoteView).initView(data)
-        }
-    }
-
-    inner class AddButtonViewHolder(view: View): BaseReclyclerAdapter.BaseViewHolder<Unit>(view){
-
-        override fun onBind(data: Unit) {
-            view.buttonText.text = view.context.getString(R.string.add_button_note)
-
-            view.setOnClickListener{
-                touchActionDelegate.onAddButtonClicked(NavigationActivity.FRAGMENT_VALUE_NOTE)
-            }
-        }
-    }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =  if(viewType == TYPE_INFO){
         NoteViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_note, parent, false))
     }else{
 
         AddButtonViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_add_button, parent, false))
+    }
+
+    class NoteViewHolder(view: View) : BaseReclyclerAdapter.BaseViewHolder<Note>(view) {
+
+        override fun onBind(data: Note, listIndex: Int) {
+            (view as NoteView).initView(data)
+        }
+    }
+
+    inner class AddButtonViewHolder(view: View): BaseReclyclerAdapter.BaseViewHolder<Unit>(view){
+
+        override fun onBind(data: Unit, listIndex: Int) {
+            view.buttonText.text = view.context.getString(R.string.add_button_note)
+
+            view.setOnClickListener{
+                touchActionDelegate.onAddButtonClicked(NavigationActivity.FRAGMENT_VALUE_NOTE)
+            }
+        }
     }
 
 }
