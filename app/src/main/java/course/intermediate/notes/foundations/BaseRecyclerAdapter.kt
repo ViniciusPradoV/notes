@@ -1,6 +1,7 @@
 package course.intermediate.notes.foundations
 
 import android.view.View
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import course.intermediate.notes.notes.NoteAdapter
 import course.intermediate.notes.tasks.TaskAdapter
@@ -9,10 +10,11 @@ abstract class BaseReclyclerAdapter<T>(
     protected val masterList: MutableList<T>
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    fun updateList(list: List<T>){
+    fun updateList(list: List<T>) {
+        val result = DiffUtil.calculateDiff(DiffUtilCallbackImpl(masterList, list))
         masterList.clear()
         masterList.addAll(list)
-        notifyDataSetChanged()
+        result.dispatchUpdatesTo(this)
 
     }
 
@@ -25,9 +27,9 @@ abstract class BaseReclyclerAdapter<T>(
 //        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
 //    }
 
-    override fun getItemViewType(position: Int): Int = if(position == 0){
+    override fun getItemViewType(position: Int): Int = if (position == 0) {
         TYPE_ADD_BUTTON
-    }else{
+    } else {
         TYPE_INFO
     }
 
@@ -36,11 +38,11 @@ abstract class BaseReclyclerAdapter<T>(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
 
         if (holder is NoteAdapter.AddButtonViewHolder) {
-            holder.onBind(Unit, position-1)
+            holder.onBind(Unit, position - 1)
         } else if (holder is TaskAdapter.AddButtonViewHolder) {
-            holder.onBind(Unit, position-1)
+            holder.onBind(Unit, position - 1)
         } else {
-            (holder as BaseViewHolder<T>).onBind(masterList[position - 1], position-1)
+            (holder as BaseViewHolder<T>).onBind(masterList[position - 1], position - 1)
         }
     }
 
@@ -48,6 +50,20 @@ abstract class BaseReclyclerAdapter<T>(
 
         const val TYPE_ADD_BUTTON = 0
         const val TYPE_INFO = 1
+    }
+
+    class DiffUtilCallbackImpl<T>(val oldList: List<T>, val newList: List<T>) : DiffUtil.Callback() {
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition] == newList[newItemPosition]
+
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+            oldList[oldItemPosition] == newList[(newItemPosition)]
+
     }
 
 }

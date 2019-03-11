@@ -19,20 +19,21 @@ class TaskView @JvmOverloads constructor(
 
     lateinit var task: Task
 
-    fun initView(task: Task, todoCheckedCallback: (Int, Boolean)-> Unit) {
+    fun initView(task: Task, todoCheckedCallback: (Int, Boolean) -> Unit) {
         this.task = task
 
         titleView.text = task.title
         task.todos.forEachIndexed { todoIndex, todo ->
-            val todoView = (LayoutInflater.from(context).inflate(R.layout.view_todo, todoContainer, false) as TodoView).apply {
-                    initView(todo) {isChecked ->
+            val todoView =
+                (LayoutInflater.from(context).inflate(R.layout.view_todo, todoContainer, false) as TodoView).apply {
+                    initView(todo) { isChecked ->
 
                         todoCheckedCallback.invoke(todoIndex, isChecked)
 
                         if (isTaskComplete()) {
-                            createStrikeThrough()
-                        }else{
-                            removeStrikeThrough()
+                            this@TaskView.titleView.setStrikeThrough()
+                        } else {
+                            this@TaskView.titleView.removeStrikeThrough()
                         }
                     }
                 }
@@ -42,19 +43,5 @@ class TaskView @JvmOverloads constructor(
 
     }
 
-    fun isTaskComplete(): Boolean = task.todos.filter { !it.isComplete }.isEmpty()
-
-    private fun createStrikeThrough() {
-
-        titleView.apply {
-            paintFlags = paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
-        }
-    }
-
-    private fun removeStrikeThrough() {
-
-        titleView.apply {
-            paintFlags = paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
-        }
-    }
+    private fun isTaskComplete(): Boolean = task.todos.filter { !it.isComplete }.isEmpty()
 }

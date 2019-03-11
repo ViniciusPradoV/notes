@@ -15,34 +15,35 @@ class TaskAdapter(
     taskList: MutableList<Task> = mutableListOf(),
     val touchActionDelegate: TasksListFragment.TouchActionDelegate,
     val dataActionDelegate: TaskListViewContract
-): BaseReclyclerAdapter<Task>(taskList) {
+) : BaseReclyclerAdapter<Task>(taskList) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder = if(viewType == TYPE_INFO){
-        TaskViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
-    }else {
-        AddButtonViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_add_button, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        if (viewType == TYPE_INFO) {
+            TaskViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.item_task, parent, false))
+        } else {
+            AddButtonViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.view_add_button, parent, false))
+        }
 
-    inner class TaskViewHolder(view: View):BaseViewHolder<Task>(view){
+    inner class TaskViewHolder(view: View) : BaseViewHolder<Task>(view) {
 
         override fun onBind(data: Task, listIndex: Int) {
 
-            (view as TaskView).initView(data){todoIndex, isChecked ->
+            (view as TaskView).initView(data) { todoIndex, isChecked ->
                 dataActionDelegate.onTodoUpdated(listIndex, todoIndex, isChecked)
             }
         }
     }
 
-    inner class AddButtonViewHolder(view: View): BaseViewHolder<Unit>(view) {
+    inner class AddButtonViewHolder(view: View) : BaseViewHolder<Unit>(view) {
         override fun onBind(data: Unit, listIndex: Int) {
             view.buttonText.text = view.context.getString(R.string.add_button_task)
 
-            view.setOnClickListener{
+            view.setOnClickListener {
                 touchActionDelegate.onAddButtonClicked(NavigationActivity.FRAGMENT_VALUE_TASK)
             }
         }
     }
 
-    override fun getItemCount(): Int = masterList.size+1
+    override fun getItemCount(): Int = masterList.size + 1
 
 }

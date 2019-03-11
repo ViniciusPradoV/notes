@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import androidx.constraintlayout.widget.ConstraintLayout
 import course.intermediate.notes.models.Todo
+import kotlinx.android.synthetic.main.activity_create.view.*
 import kotlinx.android.synthetic.main.view_todo.view.*
 
 class TodoView @JvmOverloads constructor(
@@ -21,7 +22,7 @@ class TodoView @JvmOverloads constructor(
         descriptionView.text = todo.description
         completeCheckBox.isChecked = todo.isComplete
         if (todo.isComplete) {
-            descriptionView.apply { paintFlags or Paint.STRIKE_THRU_TEXT_FLAG }
+            this@TodoView.descriptionView.setStrikeThrough()
         }
 
         setUpCheckStateListener(todo, callback)
@@ -35,24 +36,12 @@ class TodoView @JvmOverloads constructor(
             callback?.invoke(isChecked)
 
             if (isChecked) {
-
-                createStrikeThrough()
+                this@TodoView.descriptionView.setStrikeThrough()
             } else {
 
-                removeStrikeThrough()
+                this@TodoView.descriptionView.removeStrikeThrough()
             }
 
         }
     }
-
-    private fun createStrikeThrough() {
-
-        descriptionView.apply { paintFlags = descriptionView.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG }
-    }
-
-    private fun removeStrikeThrough() {
-
-        descriptionView.apply { paintFlags = descriptionView.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv() }
-    }
-
 }
