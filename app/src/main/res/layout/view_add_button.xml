@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/item_margin_default"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimaryLight"
         android:elevation="@dimen/elevation_default">
 
     <TextView
