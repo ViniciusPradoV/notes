@@ -1,42 +1,25 @@
 package course.intermediate.notes.create
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-
+import androidx.fragment.app.Fragment
 import course.intermediate.notes.R
+import course.intermediate.notes.foundations.StateChangeTextWatcher
+import course.intermediate.notes.views.CreateTodoView
+import kotlinx.android.synthetic.main.fragment_create_task.*
+import kotlinx.android.synthetic.main.view_create_task.*
+import kotlinx.android.synthetic.main.view_create_task.view.*
+import kotlinx.android.synthetic.main.view_create_todo.view.*
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val MAX_TODO_COUNT = 5
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [CreateTaskFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [CreateTaskFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class CreateTaskFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var listener: OnFragmentInteractionListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,10 +29,55 @@ class CreateTaskFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_create_task, container, false)
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    fun onButtonPressed(uri: Uri) {
-        listener?.onFragmentInteraction(uri)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        createTaskView.taskEditText.addTextChangedListener(object : StateChangeTextWatcher() {
+            override fun afterTextChanged(s: Editable?) {
+                if (!s.isNullOrEmpty() && previousValue.isNullOrEmpty()) {
+                    addTodoView()
+                } else if (s.isNullOrEmpty() && !previousValue.isNullOrEmpty()) {
+                    for (todoView in 1..(containerView.childCount-1)) removeTodoView(containerView.getChildAt(containerView.childCount - 1))
+                }
+
+                super.afterTextChanged(s)
+            }
+        })
     }
+
+    private fun addTodoView() {
+        if (canAddTodos()) {
+            val view = (LayoutInflater.from(context).inflate(
+                R.layout.view_create_todo,
+                containerView,
+                false
+            ) as CreateTodoView).apply {
+                todoEditText.addTextChangedListener(object : StateChangeTextWatcher() {
+                    override fun afterTextChanged(s: Editable?) {
+
+
+                        if (!s.isNullOrEmpty() && previousValue.isNullOrEmpty()) {
+                            addTodoView()
+                        } else if (s.isNullOrEmpty() && !previousValue.isNullOrEmpty()) {
+                            removeTodoView(this@apply)
+                        }
+
+                        super.afterTextChanged(s)
+                    }
+                })
+
+            }
+
+            containerView.addView(view)
+        }
+    }
+
+    private fun removeTodoView(view: View) {
+        containerView.removeView(view)
+
+    }
+
+    private fun canAddTodos(): Boolean = containerView.childCount <= MAX_TODO_COUNT
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -65,33 +93,11 @@ class CreateTaskFragment : Fragment() {
         listener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onFragmentInteraction(uri: Uri)
+        fun onFragmentInteraction()
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CreateTaskFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
         fun newInstance() = CreateTaskFragment()
     }
 }

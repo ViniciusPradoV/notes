@@ -10,4 +10,5 @@
     <color name="lightGrey">#DFDFDF</color>
     <color name="deepPurple">#311B92</color>
     <color name="indigo">#1A237E</color>
+    <color name="transparent">#00000000</color>
 </resources>
