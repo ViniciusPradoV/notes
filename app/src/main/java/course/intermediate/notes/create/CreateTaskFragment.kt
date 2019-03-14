@@ -8,18 +8,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import course.intermediate.notes.R
+import course.intermediate.notes.foundations.ApplicationScope
+import course.intermediate.notes.foundations.NullFieldChecker
 import course.intermediate.notes.foundations.StateChangeTextWatcher
+import course.intermediate.notes.models.Task
+import course.intermediate.notes.models.Todo
+import course.intermediate.notes.tasks.TaskLocalModel
 import course.intermediate.notes.views.CreateTodoView
 import kotlinx.android.synthetic.main.fragment_create_task.*
-import kotlinx.android.synthetic.main.view_create_task.*
 import kotlinx.android.synthetic.main.view_create_task.view.*
 import kotlinx.android.synthetic.main.view_create_todo.view.*
+import toothpick.Toothpick
+import javax.inject.Inject
 
 private const val MAX_TODO_COUNT = 5
 
 class CreateTaskFragment : Fragment() {
 
+    @Inject
+    lateinit var model: TaskLocalModel
+
     private var listener: OnFragmentInteractionListener? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        Toothpick.inject(this, ApplicationScope.scope)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,10 +51,7 @@ class CreateTaskFragment : Fragment() {
             override fun afterTextChanged(s: Editable?) {
                 if (!s.isNullOrEmpty() && previousValue.isNullOrEmpty()) {
                     addTodoView()
-                } else if (s.isNullOrEmpty() && !previousValue.isNullOrEmpty()) {
-                    for (todoView in 1..(containerView.childCount-1)) removeTodoView(containerView.getChildAt(containerView.childCount - 1))
                 }
-
                 super.afterTextChanged(s)
             }
         })
@@ -60,6 +72,11 @@ class CreateTaskFragment : Fragment() {
                             addTodoView()
                         } else if (s.isNullOrEmpty() && !previousValue.isNullOrEmpty()) {
                             removeTodoView(this@apply)
+
+                            // max_todo_count will be 5 and something will be removed if count went from 6 -> 5
+                            if(containerView.childCount == MAX_TODO_COUNT){
+                                addTodoView()
+                            }
                         }
 
                         super.afterTextChanged(s)
@@ -77,7 +94,50 @@ class CreateTaskFragment : Fragment() {
 
     }
 
-    private fun canAddTodos(): Boolean = containerView.childCount <= MAX_TODO_COUNT
+    private fun canAddTodos(): Boolean = containerView.childCount <= MAX_TODO_COUNT &&
+            !(containerView.getChildAt(containerView.childCount-1) as NullFieldChecker).hasNullField()
+
+    private fun isTaskEmpty(): Boolean = createTaskView.taskEditText.editableText.isNullOrEmpty()
+
+    fun saveTask(callback: (Boolean)->Unit) {
+        createTask()?.let{
+            model.addTask(it){
+                // Assume model always works
+                callback.invoke(true)
+            }
+        }?: callback.invoke(false)
+    }
+
+    fun createTask(): Task? {
+
+        if (!isTaskEmpty()) {
+
+            containerView.run {
+
+                var taskField: String? = null
+                val todoList: MutableList<Todo> = mutableListOf()
+
+                for (i in 0 until containerView.childCount - 1) {
+
+                    if (i == 0) {
+                        taskField = containerView.getChildAt(i).taskEditText.editableText?.toString()
+                    } else {
+
+                        if (!containerView.getChildAt(i).todoEditText.editableText.isNullOrEmpty()) {
+                            todoList.add(
+                                Todo(containerView.getChildAt(i).todoEditText.editableText.toString())
+                            )
+                        }
+                    }
+                }
+
+                return taskField?.let { Task(taskField, todoList) }
+            }
+        } else {
+            return null
+        }
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
