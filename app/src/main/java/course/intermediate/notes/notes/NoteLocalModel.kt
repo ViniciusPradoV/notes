@@ -1,14 +1,18 @@
 package course.intermediate.notes.notes
 
 import android.util.Log
+import course.intermediate.notes.application.NoteApplication
+import course.intermediate.notes.database.RoomDatabaseClient
 import course.intermediate.notes.models.Note
 import javax.inject.Inject
 
 class NoteLocalModel @Inject constructor(): INoteModel{
 
+    private var databaseClient = RoomDatabaseClient.getInstance(NoteApplication.instance.applicationContext)
+
     override fun getFakeData() = mutableListOf<Note>(
-        Note("I'm test note 1"),
-        Note("I'm test note 2")
+        Note(description = "I'm test note 1"),
+        Note(description = "I'm test note 2")
     )
 
     override fun addNote(note: Note, callback: SuccessCallback) {
