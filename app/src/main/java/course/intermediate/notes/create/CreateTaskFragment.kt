@@ -158,6 +158,8 @@ class CreateTaskFragment : Fragment() {
         fun onFragmentInteraction()
     }
 
+
+
     companion object {
         fun newInstance() = CreateTaskFragment()
     }

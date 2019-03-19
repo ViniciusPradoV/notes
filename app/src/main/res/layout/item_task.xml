@@ -2,6 +2,7 @@
 <course.intermediate.notes.views.TaskView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -12,8 +13,23 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/imageButton"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="@dimen/item_margin_default"
+            android:layout_marginEnd="@dimen/item_margin_small"
+            app:layout_constraintHorizontal_bias="0.089"/>
+
+    <ImageButton
+            android:src="@drawable/ic_close"
+            android:id="@+id/imageButton"
+            android:layout_width="@dimen/imageIconDefault"
+            android:layout_height="@dimen/imageIconDefault"
+            android:contentDescription=""
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/titleView"
+            app:layout_constraintBottom_toBottomOf="@id/titleView"
             android:layout_marginEnd="@dimen/item_margin_default"
-            android:layout_marginStart="@dimen/item_margin_default"/>
+            android:background="@color/transparent"/>
 
     <LinearLayout
             android:id="@+id/todoContainer"
