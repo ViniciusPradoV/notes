@@ -9,11 +9,12 @@ import course.intermediate.notes.models.*
 const val DATABASE_SCHEMA_VERSION = 1
 const val DB_NAME = "local-db"
 
-@Database(version = DATABASE_SCHEMA_VERSION, entities = [Tag::class, Note::class, TaskEntity::class, Todo::class])
+@Database(version = DATABASE_SCHEMA_VERSION, entities = [TaskEntity::class, Todo::class, Tag::class, Note::class])
 abstract class RoomDatabaseClient : RoomDatabase() {
 
     // Insert DAOs below
     abstract fun noteDAO(): NoteDAO
+    abstract fun taskDAO(): TaskDAO
 
     companion object {
 
@@ -22,15 +23,18 @@ abstract class RoomDatabaseClient : RoomDatabase() {
         fun getInstance(context: Context): RoomDatabaseClient {
 
             if (instance == null) {
-                //create instance
                 instance = createDatabase(context)
             }
             return instance!!
         }
 
+
+        // TODO Move away from Main Thread Queries (Hint: Solution is Coroutines)
         private fun createDatabase(context: Context): RoomDatabaseClient {
 
-            return Room.databaseBuilder(context, RoomDatabaseClient::class.java, DB_NAME).build()
+            return Room.databaseBuilder(context, RoomDatabaseClient::class.java, DB_NAME)
+                .allowMainThreadQueries()
+                .build()
 
         }
     }

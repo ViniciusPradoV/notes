@@ -38,7 +38,7 @@ class NotesListFragment : Fragment() {
         }
     }
 
-    private fun setContetView() {
+    private fun setContentView() {
 
         contextView.initView(touchActionDelegate, viewModel)
     }
@@ -46,11 +46,17 @@ class NotesListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindViewModel()
-        setContetView()
+        setContentView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.loadData()
     }
 
     private fun bindViewModel() {
         viewModel = ViewModelProviders.of(this).get(NoteViewModel::class.java)
+
         viewModel.noteListLiveData.observe(this, Observer { noteList ->
             contextView.updateList(noteList)
 
@@ -60,9 +66,8 @@ class NotesListFragment : Fragment() {
 
     companion object {
 
-        fun newInstance(): NotesListFragment {
-            return NotesListFragment()
-        }
+        fun newInstance(): NotesListFragment = NotesListFragment()
+
     }
 
     interface TouchActionDelegate {

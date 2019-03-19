@@ -1,6 +1,7 @@
 package course.intermediate.notes.database
 
 import androidx.room.*
+import course.intermediate.notes.models.Task
 import course.intermediate.notes.models.TaskEntity
 
 @Dao
@@ -16,5 +17,5 @@ interface TaskDAO {
     fun deleteTask(task: TaskEntity)
 
     @Query("SELECT * FROM tasks")
-    fun retrieveTask(task: TaskEntity)
+    fun retrieveTasks(): MutableList<Task>
 }
