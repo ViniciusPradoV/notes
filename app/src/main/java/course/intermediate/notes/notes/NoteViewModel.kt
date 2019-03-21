@@ -24,7 +24,12 @@ class NoteViewModel : ViewModel(), NoteListViewContract {
     }
 
     fun loadData(){
-        _noteListLiveData.postValue(model.retrieveNotes())
+
+        model.retrieveNotes {nullableList ->
+            nullableList?.let{
+                _noteListLiveData.postValue(it)
+            }
+        }
     }
 
     override fun onDeleteNote(note: Note) {
