@@ -14,11 +14,12 @@ import course.intermediate.notes.foundations.StateChangeTextWatcher
 import course.intermediate.notes.models.Task
 import course.intermediate.notes.models.Todo
 import course.intermediate.notes.tasks.ITaskModel
-import course.intermediate.notes.tasks.TaskLocalModel
 import course.intermediate.notes.views.CreateTodoView
 import kotlinx.android.synthetic.main.fragment_create_task.*
 import kotlinx.android.synthetic.main.view_create_task.view.*
 import kotlinx.android.synthetic.main.view_create_todo.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import toothpick.Toothpick
 import javax.inject.Inject
 
@@ -75,7 +76,7 @@ class CreateTaskFragment : Fragment() {
                             removeTodoView(this@apply)
 
                             // max_todo_count will be 5 and something will be removed if count went from 6 -> 5
-                            if(containerView.childCount == MAX_TODO_COUNT){
+                            if (containerView.childCount == MAX_TODO_COUNT) {
                                 addTodoView()
                             }
                         }
@@ -96,16 +97,19 @@ class CreateTaskFragment : Fragment() {
     }
 
     private fun canAddTodos(): Boolean = containerView.childCount <= MAX_TODO_COUNT &&
-            !(containerView.getChildAt(containerView.childCount-1) as NullFieldChecker).hasNullField()
+            !(containerView.getChildAt(containerView.childCount - 1) as NullFieldChecker).hasNullField()
 
     private fun isTaskEmpty(): Boolean = createTaskView.taskEditText.editableText.isNullOrEmpty()
 
-    fun saveTask(callback: (Boolean)->Unit) {
-        createTask()?.let{task->
-            model.addTask(task){success ->
-               callback.invoke(success)
-            }
-        }?: callback.invoke(false)
+    fun saveTask(callback: (Boolean) -> Unit) {
+        GlobalScope.launch {
+            createTask()?.let { task ->
+                model.addTask(task) { success ->
+                    callback.invoke(success)
+                }
+            } ?: callback.invoke(false)
+        }
+
     }
 
     fun createTask(): Task? {
@@ -156,7 +160,6 @@ class CreateTaskFragment : Fragment() {
     interface OnFragmentInteractionListener {
         fun onFragmentInteraction()
     }
-
 
 
     companion object {

@@ -11,16 +11,16 @@ import course.intermediate.notes.foundations.ApplicationScope
 import course.intermediate.notes.foundations.NullFieldChecker
 import course.intermediate.notes.models.Note
 import course.intermediate.notes.notes.INoteModel
-import course.intermediate.notes.tasks.ITaskModel
 import kotlinx.android.synthetic.main.fragment_create_note.*
-import kotlinx.android.synthetic.main.view_create_task.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import toothpick.Toothpick
 import javax.inject.Inject
 
 class CreateNoteFragment : Fragment(), NullFieldChecker {
 
     @Inject
-   lateinit var model: INoteModel
+    lateinit var model: INoteModel
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -39,12 +39,15 @@ class CreateNoteFragment : Fragment(), NullFieldChecker {
         return inflater.inflate(R.layout.fragment_create_note, container, false)
     }
 
-    fun saveNote(callback: (Boolean) -> Unit){
-        createNote()?.let {note->
-            model.addNote(note){success->
-                callback.invoke(success)
-            }
-        }?: callback.invoke(false)
+    fun saveNote(callback: (Boolean) -> Unit) {
+        GlobalScope.launch {
+            createNote()?.let { note ->
+                model.addNote(note) { success ->
+                    callback.invoke(success)
+                }
+            } ?: callback.invoke(false)
+        }
+
 
     }
 

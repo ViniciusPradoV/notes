@@ -13,46 +13,44 @@ class TaskLocalModel @Inject constructor() : ITaskModel {
 
     private var databaseClient = RoomDatabaseClient.getInstance(NoteApplication.instance.applicationContext)
 
-    private fun performOperationWithTimeout(function: () -> Unit, callback: SuccessCallback) {
-        GlobalScope.launch {
-            val job = async {
-                try {
-                    withTimeout(TIMEOUT_DURATION_MILLIS) {
-                        function.invoke()
-                    }
-                } catch (e: Exception) {
-                    callback.invoke(false)
+    private suspend fun performOperationWithTimeout(function: () -> Unit, callback: SuccessCallback) {
+        val job = GlobalScope.async {
+            try {
+                withTimeout(TIMEOUT_DURATION_MILLIS) {
+                    function.invoke()
                 }
+            } catch (e: Exception) {
+                callback.invoke(false)
             }
-            job.await()
-            callback.invoke(true)
         }
+        job.await()
+        callback.invoke(true)
+
     }
 
-    override fun addTask(task: Task, callback: SuccessCallback) {
-        GlobalScope.launch {
-            val masterJob = GlobalScope.async {
-                // adds taskEntity component
-                try {
-                    databaseClient.taskDAO().addTask(task)
-                } catch (e: Exception) {
-                    callback.invoke(false)
-                }
-                // add Todos list component
-                addTodosJob(task)
+    override suspend fun addTask(task: Task, callback: SuccessCallback) {
+        val masterJob = GlobalScope.async {
+            // adds taskEntity component
+            try {
+                databaseClient.taskDAO().addTask(task)
+            } catch (e: Exception) {
+                callback.invoke(false)
             }
-            masterJob.await()
-            callback.invoke(true)
+            // add Todos list component
+            addTodosJob(task)
         }
-    }
-
-    override fun updateTask(task: Task, callback: SuccessCallback) {
-        performOperationWithTimeout({databaseClient.taskDAO().updateTask(task)}, callback)
+        masterJob.await()
+        callback.invoke(true)
 
     }
 
-    override fun deleteTask(task: Task, callback: SuccessCallback) {
-        performOperationWithTimeout({databaseClient.taskDAO().deleteTask(task)}, callback)
+    override suspend fun updateTask(task: Task, callback: SuccessCallback) {
+        performOperationWithTimeout({ databaseClient.taskDAO().updateTask(task) }, callback)
+
+    }
+
+    override suspend fun deleteTask(task: Task, callback: SuccessCallback) {
+        performOperationWithTimeout({ databaseClient.taskDAO().deleteTask(task) }, callback)
 
     }
 
@@ -62,20 +60,16 @@ class TaskLocalModel @Inject constructor() : ITaskModel {
         }
     }
 
-    override fun updateTodo(todo: Todo, callback: SuccessCallback) {
-        performOperationWithTimeout({databaseClient.taskDAO().updateTodo(todo)}, callback)
+    override suspend fun updateTodo(todo: Todo, callback: SuccessCallback) {
+        performOperationWithTimeout({ databaseClient.taskDAO().updateTodo(todo) }, callback)
     }
 
-    override fun retrieveTasks(callback: (List<Task>?) -> Unit) {
-        GlobalScope.launch {
-
-            val job = async {
-                withTimeoutOrNull(TIMEOUT_DURATION_MILLIS) {
-                    databaseClient.taskDAO().retrieveTasks()
-                }
-
+    override suspend fun retrieveTasks(callback: (List<Task>?) -> Unit) {
+        val job = GlobalScope.async {
+            withTimeoutOrNull(TIMEOUT_DURATION_MILLIS) {
+                databaseClient.taskDAO().retrieveTasks()
             }
-            callback.invoke(job.await())
         }
+        callback.invoke(job.await())
     }
 }
